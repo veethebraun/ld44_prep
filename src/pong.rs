@@ -1,26 +1,54 @@
+use crate::pausable_game_data::PausableGameData;
 use amethyst::assets::{AssetStorage, Loader};
 use amethyst::core::transform::Transform;
 use amethyst::ecs::prelude::{Component, DenseVecStorage};
+use amethyst::input::{is_close_requested, is_key_down};
 use amethyst::prelude::*;
 use amethyst::renderer::{
-    Camera, Flipped, PngFormat, Projection, SpriteRender, SpriteSheet,
-    SpriteSheetFormat, SpriteSheetHandle, Texture, TextureMetadata,
+    Camera, Flipped, PngFormat, Projection, SpriteRender, SpriteSheet, SpriteSheetFormat,
+    SpriteSheetHandle, Texture, TextureMetadata, VirtualKeyCode,
 };
+
+use crate::pause_screen::Paused;
 
 pub const ARENA_HEIGHT: f32 = 100.0;
 pub const ARENA_WIDTH: f32 = 100.0;
 
 pub struct Pong;
-impl SimpleState for Pong {
-    fn on_start(&mut self, data: StateData<'_, GameData<'_, '_>>) {
+impl<'a, 'b> State<PausableGameData<'a, 'b>, StateEvent> for Pong {
+    fn on_start(&mut self, data: StateData<PausableGameData>) {
         let world = data.world;
 
         let sprite_sheet_handle = load_sprite_sheet(world);
 
-        world.register::<Paddle>();
-
         initialise_paddles(world, sprite_sheet_handle);
         initialise_camera(world);
+    }
+
+    fn handle_event(
+        &mut self,
+        _: StateData<PausableGameData>,
+        event: StateEvent,
+    ) -> Trans<PausableGameData<'a, 'b>, StateEvent> {
+        if let StateEvent::Window(event) = &event {
+            if is_close_requested(&event) {
+                Trans::Quit
+            } else if is_key_down(&event, VirtualKeyCode::Space) {
+                Trans::Push(Box::new(Paused))
+            } else {
+                Trans::None
+            }
+        } else {
+            Trans::None
+        }
+    }
+
+    fn update(
+        &mut self,
+        data: StateData<PausableGameData>,
+    ) -> Trans<PausableGameData<'a, 'b>, StateEvent> {
+        data.data.update(&data.world, true);
+        Trans::None
     }
 }
 
@@ -70,7 +98,6 @@ fn initialise_camera(world: &mut World) {
 
 /// Initialises one paddle on the left, and one paddle on the right.
 fn initialise_paddles(world: &mut World, sprite_sheet: SpriteSheetHandle) {
-
     // Assign the sprites for the paddles
     let sprite_render = SpriteRender {
         sprite_sheet: sprite_sheet.clone(),
@@ -104,7 +131,6 @@ fn initialise_paddles(world: &mut World, sprite_sheet: SpriteSheetHandle) {
 }
 
 fn load_sprite_sheet(world: &mut World) -> SpriteSheetHandle {
-    use amethyst::utils::application_root_dir;
     // Load the sprite sheet necessary to render the graphics.
     // The texture is the pixel data
     // `texture_handle` is a cloneable reference to the texture

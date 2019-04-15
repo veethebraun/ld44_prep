@@ -30,7 +30,7 @@ impl<'s> System<'s> for PaddleSystem {
                         .max(PADDLE_HEIGHT * 0.5),
                 );
             }
-            println!("{:?}", input.action_is_down("hi"));
+            //println!("{:?}", input.action_is_down("hi"));
         }
     }
 }
