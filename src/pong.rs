@@ -1,7 +1,7 @@
 use crate::pausable_game_data::PausableGameData;
 use amethyst::assets::{AssetStorage, Loader};
 use amethyst::core::transform::Transform;
-use amethyst::ecs::prelude::{Component, DenseVecStorage};
+use amethyst::ecs::prelude::{Component, DenseVecStorage, NullStorage};
 use amethyst::input::{is_close_requested, is_key_down};
 use amethyst::prelude::*;
 use amethyst::renderer::{
@@ -19,9 +19,12 @@ impl<'a, 'b> State<PausableGameData<'a, 'b>, StateEvent> for Pong {
     fn on_start(&mut self, data: StateData<PausableGameData>) {
         let world = data.world;
 
+        world.register::<Ball>();
+
         let sprite_sheet_handle = load_sprite_sheet(world);
 
-        initialise_paddles(world, sprite_sheet_handle);
+        initialise_paddles(world, sprite_sheet_handle.clone());
+        initialise_ball(world, sprite_sheet_handle);
         initialise_camera(world);
     }
 
@@ -65,6 +68,13 @@ pub struct Paddle {
     pub side: Side,
     pub width: f32,
     pub height: f32,
+}
+
+#[derive(Component)]
+#[storage(DenseVecStorage)]
+pub struct Ball {
+    pub vel_x: f32,
+    pub vel_y: f32,
 }
 
 impl Paddle {
@@ -127,6 +137,25 @@ fn initialise_paddles(world: &mut World, sprite_sheet: SpriteSheetHandle) {
         .with(right_transform)
         .with(sprite_render.clone())
         .with(Flipped::Horizontal)
+        .build();
+}
+
+fn initialise_ball(world: &mut World, sprite_sheet: SpriteSheetHandle) {
+    let sprite_render = SpriteRender {
+        sprite_sheet: sprite_sheet.clone(),
+        sprite_number: 1, // ball is the second sprite in the sprite_sheet
+    };
+
+    let x = ARENA_WIDTH / 2.0;
+    let y = ARENA_HEIGHT / 2.0;
+
+    let mut transform = Transform::default();
+    transform.set_xyz(x, y, 0.0);
+
+    world.create_entity()
+        .with(Ball { vel_x: 0.1, vel_y: 0.0})
+        .with(transform)
+        .with(sprite_render.clone())
         .build();
 }
 

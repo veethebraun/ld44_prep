@@ -42,12 +42,9 @@ impl<'a, 'b> State<PausableGameData<'a, 'b>, StateEvent> for Paused {
     }
 }
 
-#[derive(Default)]
+#[derive(Default, Component)]
+#[storage(NullStorage)]
 struct PauseScreenFlag;
-
-impl Component for PauseScreenFlag {
-    type Storage = NullStorage<Self>;
-}
 
 fn create_pause_ui(world: &mut World) {
     let font = world.read_resource::<Loader>().load(

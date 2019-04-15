@@ -2,6 +2,9 @@
 
 extern crate amethyst;
 
+#[macro_use]
+extern crate specs_derive;
+
 use amethyst::core::transform::TransformBundle;
 use amethyst::prelude::*;
 use amethyst::renderer::{DisplayConfig, DrawFlat2D, Pipeline, RenderBundle, Stage};
@@ -41,7 +44,8 @@ fn main() -> amethyst::Result<()> {
         .with_base_bundle(TransformBundle::new())?
         .with_running_bundle(input_bundle)?
         .with_base_bundle(UiBundle::<String, String>::new())?
-        .with_running(systems::PaddleSystem, "paddle_system", &["input_system"]);
+        .with_running(systems::PaddleSystem, "paddle_system", &["input_system"])
+        .with_running(systems::MoveBallSystem, "move_ball", &[]);
 
     let mut game = Application::new("./", Pong, game_data)?;
 
