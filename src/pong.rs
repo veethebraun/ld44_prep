@@ -10,6 +10,7 @@ use amethyst::renderer::{
 };
 
 use crate::pause_screen::Paused;
+use crate::audio::{initialise_audio, Music};
 
 pub const ARENA_HEIGHT: f32 = 100.0;
 pub const ARENA_WIDTH: f32 = 100.0;
@@ -20,12 +21,14 @@ impl<'a, 'b> State<PausableGameData<'a, 'b>, StateEvent> for Pong {
         let world = data.world;
 
         world.register::<Ball>();
+        world.add_resource::<Music>(Default::default());
 
         let sprite_sheet_handle = load_sprite_sheet(world);
 
         initialise_paddles(world, sprite_sheet_handle.clone());
         initialise_ball(world, sprite_sheet_handle);
         initialise_camera(world);
+        initialise_audio(world);
     }
 
     fn handle_event(
@@ -153,7 +156,7 @@ fn initialise_ball(world: &mut World, sprite_sheet: SpriteSheetHandle) {
     transform.set_xyz(x, y, 0.0);
 
     world.create_entity()
-        .with(Ball { vel_x: 0.1, vel_y: 0.0})
+        .with(Ball { vel_x: 0.14, vel_y: 0.1})
         .with(transform)
         .with(sprite_render.clone())
         .build();

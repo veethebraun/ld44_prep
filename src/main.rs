@@ -9,6 +9,7 @@ use amethyst::core::transform::TransformBundle;
 use amethyst::prelude::*;
 use amethyst::renderer::{DisplayConfig, DrawFlat2D, Pipeline, RenderBundle, Stage};
 use amethyst::ui::UiBundle;
+use amethyst::audio::AudioBundle;
 
 mod pong;
 use crate::pong::Pong;
@@ -17,6 +18,8 @@ mod pausable_game_data;
 mod systems;
 use pausable_game_data::PausableGameDataBuilder;
 mod pause_screen;
+mod audio;
+use audio::Music;
 
 fn main() -> amethyst::Result<()> {
     amethyst::start_logger(Default::default());
@@ -42,6 +45,7 @@ fn main() -> amethyst::Result<()> {
     let game_data = PausableGameDataBuilder::default()
         .with_base_bundle(RenderBundle::new(pipe, Some(config)).with_sprite_sheet_processor())?
         .with_base_bundle(TransformBundle::new())?
+        .with_base_bundle(AudioBundle::new(|music: &mut Music| music.music.next()))? //|music: &mut Music| music.music.next()))?
         .with_running_bundle(input_bundle)?
         .with_base_bundle(UiBundle::<String, String>::new())?
         .with_running(systems::PaddleSystem, "paddle_system", &["input_system"])
