@@ -1,7 +1,7 @@
 use crate::pausable_game_data::PausableGameData;
 use amethyst::assets::{AssetStorage, Loader};
 use amethyst::core::transform::Transform;
-use amethyst::ecs::prelude::{Component, DenseVecStorage, NullStorage};
+use amethyst::ecs::prelude::{Component, DenseVecStorage, };
 use amethyst::input::{is_close_requested, is_key_down};
 use amethyst::prelude::*;
 use amethyst::renderer::{

@@ -49,7 +49,8 @@ fn main() -> amethyst::Result<()> {
         .with_running_bundle(input_bundle)?
         .with_base_bundle(UiBundle::<String, String>::new())?
         .with_running(systems::PaddleSystem, "paddle_system", &["input_system"])
-        .with_running(systems::MoveBallSystem, "move_ball", &[]);
+        .with_running(systems::MoveBallSystem, "move_ball", &[])
+        .with_running(systems::SoundFxSystem, "sound_fx", &["input_system"]);
 
     let mut game = Application::new("./", Pong, game_data)?;
 
